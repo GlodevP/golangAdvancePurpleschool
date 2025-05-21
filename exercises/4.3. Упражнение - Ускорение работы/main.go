@@ -11,9 +11,9 @@ func main() {
 	t := time.Now()
 	var wg sync.WaitGroup
 	for i := 0; i < 10; i++ {
-
+		wg.Add(1)
 		go func() {
-			wg.Add(1)
+
 			getHTTPCode("https://ya.ru")
 			wg.Done()
 		}()
