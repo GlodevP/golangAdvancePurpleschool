@@ -3,30 +3,22 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"sync"
 	"time"
 )
 
 func main() {
 	t := time.Now()
-	var wg sync.WaitGroup
-	for i := 0; i < 10; i++ {
-		wg.Add(1)
-		go func() {
-
-			getHTTPCode("https://ya.ru")
-			wg.Done()
-		}()
-	}
-	wg.Wait()
+	code := make(chan int)
+	go getHTTPCode("https://ya.ru", code)
+	fmt.Println(<-code)
 	fmt.Println(time.Since(t))
 }
 
-func getHTTPCode(url string) {
+func getHTTPCode(url string, codeCh chan int) {
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("Error http get from url: %s, error: %s", url, err)
 		return
 	}
-	fmt.Printf("Code: %d \n", resp.StatusCode)
+	codeCh <- resp.StatusCode
 }
