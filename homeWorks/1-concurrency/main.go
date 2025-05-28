@@ -25,7 +25,6 @@ func sqrt10ChInChOut(chIn chan int, chOut chan int) {
 		j := <-chIn
 		chOut <- j * j
 	}
-	close(chIn)
 }
 
 func random10SliceInChanel(ch chan int) {
