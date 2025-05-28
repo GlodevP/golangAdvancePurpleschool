@@ -19,5 +19,6 @@ func main() {
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	randInt := rand.Int31n(6) + 1
 	randIntStr := strconv.Itoa(int(randInt))
+	w.Header().Set("Content-Type", "text/plain")
 	w.Write([]byte(randIntStr))
 }
