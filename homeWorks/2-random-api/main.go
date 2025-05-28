@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -13,7 +14,7 @@ func main() {
 		Addr:    ":8080",
 		Handler: r,
 	}
-	s.ListenAndServe()
+	fmt.Println(s.ListenAndServe())
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
