@@ -29,7 +29,7 @@ func sqrt10ChInChOut(chIn chan int, chOut chan int) {
 
 func random10SliceInChanel(ch chan int) {
 	sl := make([]int, 10)
-	for i := range 10 {
+	for i := 0; i < 10; i++ {
 		sl[i] = rand.Intn(101)
 	}
 	for i := range sl {
