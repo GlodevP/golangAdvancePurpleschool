@@ -20,7 +20,7 @@ func NewVerifyHandler(cfg *configs.Config, router *http.ServeMux) {
 			cfg: cfg,
 		},
 	}
-	router.HandleFunc("POST /send", verify.getSendHandleFunc())
+	router.HandleFunc("POST /verify/send", verify.getSendHandleFunc())
 	router.HandleFunc("GET /verify/{hash}", verify.getVerifyHandleFunc())
 }
 
@@ -32,30 +32,30 @@ func (handler *VerifyHandler) getSendHandleFunc() func(w http.ResponseWriter, r 
 			res := &SendResponse{
 				Success: false,
 			}
-			response.Json(w,res,http.StatusInternalServerError)
+			response.Json(w, res, http.StatusInternalServerError)
 			return
 		}
 		res := &SendResponse{
-			Success: false,
-			Email: testEmailAddr,
+			Success: true,
+			Email:   testEmailAddr,
 		}
-		response.Json(w,res,http.StatusOK)
+		response.Json(w, res, http.StatusOK)
 	}
 }
 
 func (handler *VerifyHandler) getVerifyHandleFunc() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		hash := r.PathValue("id")
-		if handler.isHashVerify(hash){
+		hash := r.PathValue("hash")
+		if handler.isHashVerify(hash) {
 			res := &VerifyResponse{
 				Success: true,
 			}
-			response.Json(w,res,http.StatusOK)
+			response.Json(w, res, http.StatusOK)
 		} else {
 			res := &VerifyResponse{
 				Success: false,
 			}
-			response.Json(w,res,http.StatusBadRequest)
+			response.Json(w, res, http.StatusBadRequest)
 		}
 	}
 }
