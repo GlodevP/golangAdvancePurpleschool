@@ -9,6 +9,6 @@ import (
 func main() {
 	cfg := configs.NewConfigs()
 	router := http.NewServeMux()
-	verify.NewVerifyHandler(cfg,router)
-
+	verify.NewVerifyHandler(cfg, router)
+	http.ListenAndServe(cfg.Url, router)
 }
