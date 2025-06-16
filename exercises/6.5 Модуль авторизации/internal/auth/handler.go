@@ -3,6 +3,7 @@ package auth
 import (
 	"net/http"
 	"temp/configs"
+	"temp/pkg/request"
 	"temp/pkg/response"
 )
 
@@ -25,6 +26,11 @@ func NewAuthHandler(router *http.ServeMux, deps *AuthHandlerDeps) {
 
 func (handler *authHandler) getLoginHandleFunction() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		_, err := request.HandleBody[LoginRequest](&w, r)
+		if err != nil {
+			println(err.Error())
+			return
+		}
 		res := LoginResponse{
 			Token: "123",
 		}
@@ -34,6 +40,14 @@ func (handler *authHandler) getLoginHandleFunction() func(w http.ResponseWriter,
 
 func (handler *authHandler) getRegisterHandleFunction() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("/auth/register"))
+		_, err := request.HandleBody[RegisterRequest](&w, r)
+		if err != nil {
+			println(err.Error())
+			return
+		}
+		res := RegisterResponse{
+			Token: "123",
+		}
+		response.Json(w, res, 200)
 	}
 }
