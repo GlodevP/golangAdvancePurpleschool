@@ -11,7 +11,8 @@ func (handler VerifyHandler) isHashVerify(hash string) bool {
 	if err != nil {
 		return false
 	}
-	if slicehelpers.ContainsStringInStringSlicce(handler.dependens.db, hash) {
+	if slicehelpers.ContainsInStringSlice(handler.dependens.db, hash) {
+		handler.dependens.db = slicehelpers.RemoveInStringSlice(handler.dependens.db, hash)
 		return true
 	} else {
 		return false
