@@ -1,7 +1,7 @@
 package verify
 
 import (
-	"fmt"
+	slicehelpers "3-validation-api/pkg/sliceHelpers"
 
 	"github.com/google/uuid"
 )
@@ -9,7 +9,12 @@ import (
 func (handler VerifyHandler) isHashVerify(hash string) bool {
 	err := uuid.Validate(hash)
 	if err != nil {
-		fmt.Println(err)
+		return false
 	}
-	return err == nil
+	if slicehelpers.ContainsStringInStringSlicce(handler.dependens.db, hash) {
+		return true
+	} else {
+		return false
+	}
+
 }

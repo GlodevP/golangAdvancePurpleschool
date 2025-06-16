@@ -2,6 +2,7 @@ package verify
 
 import (
 	"3-validation-api/configs"
+	"3-validation-api/pkg/request"
 	"3-validation-api/pkg/response"
 	"net/http"
 )
@@ -12,12 +13,14 @@ type VerifyHandler struct {
 
 type VerifyDependens struct {
 	cfg *configs.Config
+	db  []string
 }
 
 func NewVerifyHandler(cfg *configs.Config, router *http.ServeMux) {
 	verify := VerifyHandler{
 		dependens: &VerifyDependens{
 			cfg: cfg,
+			db:  []string{},
 		},
 	}
 	router.HandleFunc("POST /verify/send", verify.getSendHandleFunc())
@@ -26,8 +29,12 @@ func NewVerifyHandler(cfg *configs.Config, router *http.ServeMux) {
 
 func (handler *VerifyHandler) getSendHandleFunc() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		testEmailAddr := "info@glo-dev.ru"
-		err := handler.sendEmailVerify(testEmailAddr)
+
+		sreq, err := request.HandleBody[SendRequest](&w, r)
+		if err != nil {
+			return
+		}
+		err = handler.sendEmailVerify(sreq.Email)
 		if err != nil {
 			res := &SendResponse{
 				Success: false,
@@ -37,7 +44,6 @@ func (handler *VerifyHandler) getSendHandleFunc() func(w http.ResponseWriter, r 
 		}
 		res := &SendResponse{
 			Success: true,
-			Email:   testEmailAddr,
 		}
 		response.Json(w, res, http.StatusOK)
 	}
