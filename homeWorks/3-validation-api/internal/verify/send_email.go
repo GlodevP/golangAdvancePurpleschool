@@ -20,5 +20,6 @@ func (handler *VerifyHandler) sendEmailVerify(emailAddr string) error {
 		fmt.Println(err)
 		return err
 	}
+	handler.dependens.db = append(handler.dependens.db, hash)
 	return nil
 }
