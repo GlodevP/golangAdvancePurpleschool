@@ -2,6 +2,7 @@ package verify
 
 import (
 	"fmt"
+	"net/smtp"
 	_ "net/smtp"
 
 	"github.com/google/uuid"
@@ -15,11 +16,11 @@ func (handler *VerifyHandler) sendEmailVerify(emailAddr string) error {
 	mail.To = []string{emailAddr}
 	mail.Subject = "Verify you email address"
 	mail.HTML = []byte(fmt.Sprintf("<p>Click this <a href=\"%s/verify/%s\">link</a> to verify tou email.</p>", handler.dependens.cfg.Url, hash))
-	// err := mail.Send(handler.dependens.cfg.EmailConfig.EmailServer+":"+handler.dependens.cfg.EmailConfig.EmailServerPort, smtp.PlainAuth("", handler.dependens.cfg.EmailConfig.EmailSendler, handler.dependens.cfg.EmailConfig.EmailSecret, handler.dependens.cfg.EmailConfig.EmailServer))
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return err
-	// }
+	err := mail.Send(handler.dependens.cfg.EmailConfig.EmailServer+":"+handler.dependens.cfg.EmailConfig.EmailServerPort, smtp.PlainAuth("", handler.dependens.cfg.EmailConfig.EmailSendler, handler.dependens.cfg.EmailConfig.EmailSecret, handler.dependens.cfg.EmailConfig.EmailServer))
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 	handler.dependens.DB.AddHash(emailAddr, hash)
 	return nil
 }

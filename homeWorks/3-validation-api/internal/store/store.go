@@ -51,7 +51,7 @@ func (db *DB) AddHash(email string, hash string) error {
 	if err := file.Truncate(0); err != nil {
 		return err
 	}
-	err = json.NewEncoder(file).Encode(&dbEntrys)
+	err = json.NewEncoder(file).Encode(dbEntrys)
 	if err != nil {
 		return err
 	}
@@ -102,7 +102,7 @@ func (db *DB) DelHash(email string, hash string) error {
 	if err := file.Truncate(0); err != nil {
 		return err
 	}
-	err = json.NewEncoder(file).Encode(&dbEntrys)
+	err = json.NewEncoder(file).Encode(dbEntrys)
 	if err != nil {
 		return err
 	}
