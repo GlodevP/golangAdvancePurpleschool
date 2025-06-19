@@ -9,6 +9,7 @@ import (
 
 type Config struct {
 	Url         string
+	NameDB      string
 	EmailConfig EmailConfig
 }
 
@@ -25,7 +26,8 @@ func NewConfigs() *Config {
 		fmt.Printf("Файл .env не загружен: %s\n", err)
 	}
 	return &Config{
-		Url: os.Getenv("WEB_SERVER_URL"),
+		Url:    os.Getenv("WEB_SERVER_URL"),
+		NameDB: os.Getenv("NAME_DB"),
 		EmailConfig: EmailConfig{
 			EmailServer:     os.Getenv("MAIL_SERVER"),
 			EmailServerPort: os.Getenv("MAIL_SERVER_PORT"),
