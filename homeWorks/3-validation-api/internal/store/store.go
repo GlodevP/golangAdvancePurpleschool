@@ -18,8 +18,8 @@ func (e *EmailNotFoundError) Error() string {
 }
 
 type dbEntry struct {
-	email string `json: "Email"`
-	hash  string `Json: "Hash"`
+	Email string `json:"email"`
+	Hash  string `json:"hash"`
 }
 
 func NewDB(nameDB string) (*DB, error) {
@@ -32,18 +32,26 @@ func NewDB(nameDB string) (*DB, error) {
 }
 
 func (db *DB) AddHash(email string, hash string) error {
-	file, err := os.OpenFile(db.nameFile, os.O_WRONLY, 0666)
+	file, err := os.OpenFile(db.nameFile, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 	var dbEntrys []dbEntry
-	err = json.NewEncoder(file).Encode(&dbEntrys)
+	err = json.NewDecoder(file).Decode(&dbEntrys)
 	if err != nil {
 		return err
 	}
-	dbEntrys = append(dbEntrys, dbEntry{email: email, hash: hash})
-	err = json.NewDecoder(file).Decode(&dbEntrys)
+	dbEntrys = append(dbEntrys, dbEntry{Email: email, Hash: hash})
+
+	// Переместить указатель и очистить файл
+	if _, err := file.Seek(0, 0); err != nil {
+		return err
+	}
+	if err := file.Truncate(0); err != nil {
+		return err
+	}
+	err = json.NewEncoder(file).Encode(&dbEntrys)
 	if err != nil {
 		return err
 	}
@@ -57,37 +65,44 @@ func (db *DB) GetEmailByHash(hash string) (string, error) {
 	}
 	defer file.Close()
 	var dbEntrys []dbEntry
-	err = json.NewEncoder(file).Encode(&dbEntrys)
+	err = json.NewDecoder(file).Decode(&dbEntrys)
 	if err != nil {
 		return "", err
 	}
 	for _, i := range dbEntrys {
-		if hash == i.hash {
-			return i.email, nil
+		if hash == i.Hash {
+			return i.Email, nil
 		}
 	}
 	return "", &EmailNotFoundError{Msg: "Email not found"}
 }
 
 func (db *DB) DelHash(email string, hash string) error {
-	file, err := os.OpenFile(db.nameFile, os.O_WRONLY, 0666)
+	file, err := os.OpenFile(db.nameFile, os.O_RDWR, 0666)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 	var dbEntrys []dbEntry
-	err = json.NewEncoder(file).Encode(&dbEntrys)
+	err = json.NewDecoder(file).Decode(&dbEntrys)
 	if err != nil {
 		return err
 	}
-	serchEntry := dbEntry{email: email, hash: hash}
+	serchEntry := dbEntry{Email: email, Hash: hash}
 	filtered := dbEntrys[:0]
 	for _, i := range dbEntrys {
 		if i != serchEntry {
 			filtered = append(filtered, i)
 		}
 	}
-	err = json.NewDecoder(file).Decode(&dbEntrys)
+	// Переместить указатель и очистить файл
+	if _, err := file.Seek(0, 0); err != nil {
+		return err
+	}
+	if err := file.Truncate(0); err != nil {
+		return err
+	}
+	err = json.NewEncoder(file).Encode(&dbEntrys)
 	if err != nil {
 		return err
 	}
