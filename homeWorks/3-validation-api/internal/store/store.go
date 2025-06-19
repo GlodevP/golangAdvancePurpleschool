@@ -2,6 +2,7 @@ package store
 
 import (
 	"encoding/json"
+	"io"
 	"os"
 )
 
@@ -39,7 +40,7 @@ func (db *DB) AddHash(email string, hash string) error {
 	defer file.Close()
 	var dbEntrys []dbEntry
 	err = json.NewDecoder(file).Decode(&dbEntrys)
-	if err != nil {
+	if err != nil && err != io.EOF {
 		return err
 	}
 	dbEntrys = append(dbEntrys, dbEntry{Email: email, Hash: hash})
@@ -102,7 +103,7 @@ func (db *DB) DelHash(email string, hash string) error {
 	if err := file.Truncate(0); err != nil {
 		return err
 	}
-	err = json.NewEncoder(file).Encode(dbEntrys)
+	err = json.NewEncoder(file).Encode(filtered)
 	if err != nil {
 		return err
 	}
