@@ -21,6 +21,9 @@ func (handler *VerifyHandler) sendEmailVerify(emailAddr string) error {
 		fmt.Println(err)
 		return err
 	}
-	handler.dependens.DB.AddHash(emailAddr, hash)
+	err = handler.dependens.DB.AddHash(emailAddr, hash)
+	if err != nil {
+		return err
+	}
 	return nil
 }
