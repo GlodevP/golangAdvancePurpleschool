@@ -17,8 +17,11 @@ type VerifyDependens struct {
 	DB  *store.DB
 }
 
-func NewVerifyHandler(cfg *configs.Config, router *http.ServeMux) {
-	db, _ := store.NewDB(cfg.NameDB)
+func NewVerifyHandler(cfg *configs.Config, router *http.ServeMux) error {
+	db, err := store.NewDB(cfg.NameDB)
+	if err != nil {
+		return err
+	}
 	verify := VerifyHandler{
 		dependens: &VerifyDependens{
 			cfg: cfg,
@@ -27,6 +30,7 @@ func NewVerifyHandler(cfg *configs.Config, router *http.ServeMux) {
 	}
 	router.HandleFunc("POST /verify/send", verify.getSendHandleFunc())
 	router.HandleFunc("GET /verify/{hash}", verify.getVerifyHandleFunc())
+	return nil
 }
 
 func (handler *VerifyHandler) getSendHandleFunc() func(w http.ResponseWriter, r *http.Request) {
