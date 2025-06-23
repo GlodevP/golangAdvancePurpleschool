@@ -10,6 +10,7 @@ import (
 type Config struct {
 	WServer    WebserverConfig
 	AuthConfig AuthConfig
+	DBConfig DBConfig 
 }
 
 type AuthConfig struct {
@@ -18,6 +19,9 @@ type AuthConfig struct {
 
 type WebserverConfig struct {
 	Addr string
+}
+type DBConfig struct{
+	DSN string
 }
 
 func LoadConfig() Config {
@@ -31,6 +35,9 @@ func LoadConfig() Config {
 		},
 		AuthConfig: AuthConfig{
 			Secret: os.Getenv("Tocken"),
+		},
+		DBConfig: DBConfig{
+			DSN: os.Getenv("DSN"),
 		},
 	}
 }
