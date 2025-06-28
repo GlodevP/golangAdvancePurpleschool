@@ -10,8 +10,8 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "envFile": "/home/glodev/Документы/program/golang/purpleschool/golangAdvance/homeWorks/3-validation-api/.env",
-            "program": "/home/glodev/Документы/program/golang/purpleschool/golangAdvance/homeWorks/3-validation-api/cmd"
+            "envFile": "/Users/glodev/Documents/golang/golangAdvancePurpleschool/homeWorks/4-order-api/.env",
+            "program": "/Users/glodev/Documents/golang/golangAdvancePurpleschool/homeWorks/4-order-api/cmd"
         }
     ]
 }

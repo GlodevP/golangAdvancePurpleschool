@@ -1,31 +1,17 @@
 package order
 
-type GetOrderRequest struct{
+import "4-order-api/internal/store"
 
-}
+
 type GetOrderResponce struct{
-
-}
-
-type GetOrdersRequest struct{
-
-}
-type GetOrdersResponce struct{
-
+	Success bool
+	store.Order
 }
 
 type AddOrderRequest struct{
-	
+	store.Order
 }
 
 type AddOrderResponce struct{
-
-}
-
-type DeleteOrderRequest struct{
-	
-}
-
-type DeleteOrderResponce struct{
-
+	Success bool
 }
