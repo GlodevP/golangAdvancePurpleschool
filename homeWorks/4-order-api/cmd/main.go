@@ -7,11 +7,11 @@ import (
 	"net/http"
 )
 
-func main(){
+func main() {
 	cfg := config.NewConfigs()
 	router := http.NewServeMux()
 	db := store.NewDB(*cfg)
-	order.NewOrderHandle(cfg,router,db)
-	http.ListenAndServe(cfg.Webserver.Addr,router)
-	
+	order.NewOrderHandle(cfg, router, db)
+	http.ListenAndServe(cfg.Webserver.Addr, router)
+
 }
