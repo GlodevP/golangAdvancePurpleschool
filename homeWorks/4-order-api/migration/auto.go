@@ -21,5 +21,5 @@ func main(){
 	if err != nil {
 		log.Fatalln("Error connect db: ",err)
 	}
-	db.AutoMigrate(&store.Order{})
+	db.AutoMigrate(&store.Product{})
 }

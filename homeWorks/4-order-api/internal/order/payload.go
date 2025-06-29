@@ -3,15 +3,15 @@ package order
 import "4-order-api/internal/store"
 
 
-type GetOrderResponce struct{
+type GetProductResponce struct{
 	Success bool
-	store.Order
+	store.Product
 }
 
-type AddOrderRequest struct{
-	store.Order
+type AddProductRequest struct{
+	store.Product
 }
 
-type AddOrderResponce struct{
+type AddProductResponce struct{
 	Success bool
 }

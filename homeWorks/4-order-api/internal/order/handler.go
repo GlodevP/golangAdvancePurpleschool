@@ -32,40 +32,40 @@ func NewOrderHandle(cfg *config.Config, r *http.ServeMux, db *store.DB) {
 func (handler OrderHandler) getOrderHandler() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
-		o, err := handler.Dependens.db.GetOrder(id)
+		o, err := handler.Dependens.db.GetProduct(id)
 		if err != nil {
 			log.Println(err)
-			response.Json(w, GetOrderResponce{
+			response.Json(w, GetProductResponce{
 				Success: false,
 			}, http.StatusBadRequest)
 			return
 		}
-		response.Json(w, &GetOrderResponce{
+		response.Json(w, &GetProductResponce{
 			Success: true,
-			Order:   *o,
+			Product:   *o,
 		}, http.StatusOK)
 	}
 }
 
 func (handler OrderHandler) addOrderHandler() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		req, err := request.HandleBody[AddOrderRequest](&w, r)
+		req, err := request.HandleBody[AddProductRequest](&w, r)
 		if err != nil {
 			log.Println(err)
-			response.Json(w, AddOrderResponce{Success: false}, http.StatusBadRequest)
+			response.Json(w, AddProductResponce{Success: false}, http.StatusBadRequest)
 			return
 		}
-		err = handler.Dependens.db.AddOrder(&store.Order{
+		err = handler.Dependens.db.AddProduct(&store.Product{
 			Name:        req.Name,
 			Description: req.Description,
 		})
 		if err != nil {
 			log.Println(err)
-			response.Json(w, AddOrderResponce{Success: false}, http.StatusBadRequest)
+			response.Json(w, AddProductResponce{Success: false}, http.StatusBadRequest)
 			return
 		}
 
-		response.Json(w, AddOrderResponce{Success: true}, http.StatusOK)
+		response.Json(w, AddProductResponce{Success: true}, http.StatusOK)
 		return
 
 	}
