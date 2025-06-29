@@ -4,7 +4,7 @@ import "4-order-api/internal/store"
 
 
 type GetProductResponce struct{
-	Success bool
+	Success bool `json:"success"`
 	store.Product
 }
 
@@ -13,5 +13,5 @@ type AddProductRequest struct{
 }
 
 type AddProductResponce struct{
-	Success bool
+	Success bool `json:"success"`
 }

@@ -12,7 +12,7 @@ type Product struct{
 	Images pq.StringArray `gorm:"type:text[]" json:"images"`
 }
 
-func NewOrder(name string,description string)*Product{
+func NewProduct(name string,description string)*Product{
 	return &Product{
 		Name: name,
 		Description: description,

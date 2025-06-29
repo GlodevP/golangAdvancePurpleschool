@@ -2,8 +2,6 @@ package store
 
 import (
 	"4-order-api/config"
-	"log"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -12,14 +10,14 @@ type DB struct{
 	db *gorm.DB
 }
 
-func NewDB(cfg config.Config) *DB{
+func NewDB(cfg config.Config) (*DB,error){
 	db,err := gorm.Open(postgres.Open(cfg.DB.DSN))
 	if err != nil {
-		log.Fatalln("Error connect db: ",err)
+		return nil,err
 	}
 	return &DB{
 		db: db,
-	}
+	},nil
 }
 
 func (s *DB) GetProduct(id string)(*Product,error){
