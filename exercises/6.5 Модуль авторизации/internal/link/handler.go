@@ -1,51 +1,127 @@
 package link
 
 import (
-	"fmt"
+	"log"
 	"net/http"
+	"strconv"
+	"temp/pkg/request"
+	"temp/pkg/response"
+
+	"gorm.io/gorm"
 )
-type LinkRepositoryDeps struct{
-	router *http.ServeMux
+
+type LinkRepositoryDeps struct {
+	Router     *http.ServeMux
+	Repository *LinkRepository
+}
+
+type linkHandler struct {
+	router     *http.ServeMux
 	repository *LinkRepository
 }
 
-type linkHandler struct{
-	router *http.ServeMux
-	repository *LinkRepository
-}
-
-func NewLinkHandler(dep *LinkRepositoryDeps){
+func NewLinkHandler(dep *LinkRepositoryDeps) {
 	l := linkHandler{
-		router: dep.router,
-		repository: dep.repository,
+		router:     dep.Router,
+		repository: dep.Repository,
 	}
-	l.router.HandleFunc("POST /link",l.addLink())
-	l.router.HandleFunc("GET /link/{hash}",l.getLink())
-	l.router.HandleFunc("PATH /link/{id}",l.updateLink())
-	l.router.HandleFunc("DELET /link/{id}",l.dellLink())
-	
+	l.router.HandleFunc("POST /link", l.addLink())
+	l.router.HandleFunc("GET /link/{hash}", l.goToLink())
+	l.router.HandleFunc("PATCH /link/{id}", l.updateLink())
+	l.router.HandleFunc("DELET /link/{id}", l.dellLink())
 
 }
 
-
-func (h *linkHandler) addLink() func(w http.ResponseWriter, r *http.Request){
+func (h *linkHandler) addLink() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		h.repository.Create(NewLink("test"))
+		body, err := request.HandleBody[CreateRequest](&w, r)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		link := NewLink(body.Url)
+		for {
+			existLink, _ := h.repository.GetByHash(link.Hash)
+			if existLink == nil {
+				break
+			}
+			link.GenerateHash()
+		}
+		l, err := h.repository.Create(link)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		response.Json(w, l, http.StatusCreated)
 	}
 }
-func (h *linkHandler) getLink() func(w http.ResponseWriter, r *http.Request){
+func (h *linkHandler) goToLink() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		
+		hash := r.PathValue("hash")
+		if hash == "" {
+			http.Error(w, "not valid id", http.StatusBadRequest)
+			return
+		}
+		l, err := h.repository.GetByHash(hash)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		http.Redirect(w, r, l.Url, http.StatusTemporaryRedirect)
 	}
 }
-func (h *linkHandler) dellLink() func(w http.ResponseWriter, r *http.Request){
+func (h *linkHandler) dellLink() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := r.PathValue("id")
-		fmt.Println(id)
+		idString := r.PathValue("id")
+		if idString == "" {
+			http.Error(w, "not valid id", http.StatusBadRequest)
+			return
+		}
+		id, err := strconv.ParseUint(idString, 10, 32)
+		if err != nil {
+			http.Error(w, "not valid id", http.StatusBadRequest)
+			return
+		}
+		_, err = h.repository.GetByID(uint(id))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		err = h.repository.Delete(uint(id))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		response.Json(w, nil, http.StatusOK)
 	}
 }
-func (h *linkHandler) updateLink() func(w http.ResponseWriter, r *http.Request){
+func (h *linkHandler) updateLink() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		
+		b, err := request.HandleBody[UpdateRequest](&w, r)
+		if err != nil {
+			return
+		}
+		idString := r.PathValue("id")
+		if idString == "" {
+			http.Error(w, "not valid id", http.StatusBadRequest)
+			return
+		}
+		id, err := strconv.ParseUint(idString, 10, 32)
+		if err != nil {
+			http.Error(w, "not valid id", http.StatusBadRequest)
+			return
+		}
+		link, err := h.repository.Update(&Link{
+			Model: gorm.Model{
+				ID: uint(id),
+			},
+			Url:  b.Url,
+			Hash: b.Hash,
+		})
+		if err != nil {
+			http.Error(w, "not valid id", http.StatusBadRequest)
+			return
+		}
+		response.Json(w, link, http.StatusCreated)
 	}
 }

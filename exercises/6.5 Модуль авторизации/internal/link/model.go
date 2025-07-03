@@ -6,24 +6,29 @@ import (
 	"gorm.io/gorm"
 )
 
-type Link struct{
+type Link struct {
 	gorm.Model
-	Url string `json:"url"`
+	Url  string `json:"url"`
 	Hash string `json:"hash" gorm:"uniqueIndex"`
 }
 
-func NewLink(url string) *Link{
-	return &Link{
+func NewLink(url string) *Link {
+	l := &Link{
 		Url: url,
-		Hash: RandStringRunes(4),
 	}
+	l.GenerateHash()
+	return l
+}
+
+func (l *Link) GenerateHash() {
+	l.Hash = RandStringRunes(4)
 }
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-func RandStringRunes(n int)string{
-	b := make([]rune,n)
-	for i := range b{
+func RandStringRunes(n int) string {
+	b := make([]rune, n)
+	for i := range b {
 		b[i] = letterRunes[rand.Intn(int(len(letterRunes)))]
 	}
 	return string(b)
