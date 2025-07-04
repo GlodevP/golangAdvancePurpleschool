@@ -1,4 +1,4 @@
-package store
+package order
 
 import (
 	"gorm.io/gorm"

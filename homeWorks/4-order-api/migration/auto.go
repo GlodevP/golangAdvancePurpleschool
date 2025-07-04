@@ -1,7 +1,7 @@
 package main
 
 import (
-	"4-order-api/internal/store"
+	"4-order-api/internal/order"
 	"fmt"
 	"log"
 	"os"
@@ -21,5 +21,5 @@ func main(){
 	if err != nil {
 		log.Fatalln("Error connect db: ",err)
 	}
-	db.AutoMigrate(&store.Product{})
+	db.AutoMigrate(&order.Product{})
 }

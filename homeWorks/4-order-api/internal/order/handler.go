@@ -2,7 +2,6 @@ package order
 
 import (
 	"4-order-api/config"
-	"4-order-api/internal/store"
 	"4-order-api/pkg/request"
 	"4-order-api/pkg/response"
 	"log"
@@ -15,10 +14,10 @@ type OrderHandler struct {
 
 type OrderDependens struct {
 	cfg *config.Config
-	db  *store.DB
+	db  *Repository
 }
 
-func NewOrderHandle(cfg *config.Config, r *http.ServeMux, db *store.DB) {
+func NewOrderHandle(cfg *config.Config, r *http.ServeMux, db *Repository) {
 	h := OrderHandler{
 		Dependens: &OrderDependens{
 			cfg: cfg,
@@ -26,7 +25,7 @@ func NewOrderHandle(cfg *config.Config, r *http.ServeMux, db *store.DB) {
 		},
 	}
 	r.HandleFunc("GET /order/{id}", h.getOrderHandler())
-	r.HandleFunc("POST /order/add", h.addOrderHandler())
+	r.HandleFunc("POST /order", h.addOrderHandler())
 }
 
 func (handler OrderHandler) getOrderHandler() func(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +54,7 @@ func (handler OrderHandler) addOrderHandler() func(w http.ResponseWriter, r *htt
 			response.Json(w, AddProductResponce{Success: false}, http.StatusBadRequest)
 			return
 		}
-		err = handler.Dependens.db.AddProduct(&store.Product{
+		err = handler.Dependens.db.AddProduct(&Product{
 			Name:        req.Name,
 			Description: req.Description,
 		})
@@ -66,7 +65,5 @@ func (handler OrderHandler) addOrderHandler() func(w http.ResponseWriter, r *htt
 		}
 
 		response.Json(w, AddProductResponce{Success: true}, http.StatusOK)
-		return
-
 	}
 }

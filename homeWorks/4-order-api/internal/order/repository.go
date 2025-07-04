@@ -1,4 +1,4 @@
-package store
+package order
 
 import (
 	"4-order-api/config"
@@ -6,21 +6,21 @@ import (
 	"gorm.io/gorm"
 )
 
-type DB struct{
+type Repository struct{
 	db *gorm.DB
 }
 
-func NewDB(cfg config.Config) (*DB,error){
+func NewRepository(cfg config.Config) (*Repository,error){
 	db,err := gorm.Open(postgres.Open(cfg.DB.DSN))
 	if err != nil {
 		return nil,err
 	}
-	return &DB{
+	return &Repository{
 		db: db,
 	},nil
 }
 
-func (s *DB) GetProduct(id string)(*Product,error){
+func (s *Repository) GetProduct(id string)(*Product,error){
 	var o Product
 	err := s.db.First(&o,"id = ?",id).Error
 	if err != nil {
@@ -28,7 +28,7 @@ func (s *DB) GetProduct(id string)(*Product,error){
 	}
 	return &o,nil
 }
-func (s *DB) AddProduct(o *Product)error{
+func (s *Repository) AddProduct(o *Product)error{
 	err := s.db.Create(o).Error
 	if err != nil {
 		return err

@@ -3,7 +3,6 @@ package main
 import (
 	"4-order-api/config"
 	"4-order-api/internal/order"
-	"4-order-api/internal/store"
 	"log"
 	"net/http"
 )
@@ -11,7 +10,7 @@ import (
 func main() {
 	cfg := config.NewConfigs()
 	router := http.NewServeMux()
-	db,err := store.NewDB(*cfg)
+	db,err := order.NewRepository(*cfg)
 	if err != nil {
 		log.Fatalln(err)
 	}
