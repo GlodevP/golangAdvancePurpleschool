@@ -2,8 +2,10 @@ package order
 
 import (
 	"4-order-api/config"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Repository struct{
@@ -20,18 +22,35 @@ func NewRepository(cfg config.Config) (*Repository,error){
 	},nil
 }
 
-func (s *Repository) GetProduct(id string)(*Product,error){
+func (rep *Repository) Add(o *Product)error{
+	err := rep.db.Create(o).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (rep *Repository) GetByID(id uint)(*Product,error){
 	var o Product
-	err := s.db.First(&o,"id = ?",id).Error
+	err := rep.db.First(&o,"id = ?",id).Error
 	if err != nil {
 		return nil, err
 	}
 	return &o,nil
 }
-func (s *Repository) AddProduct(o *Product)error{
-	err := s.db.Create(o).Error
-	if err != nil {
-		return err
+
+
+func (rep *Repository) Update(p *Product)(*Product,error){
+	res := rep.db.Clauses(clause.Returning{}).Updates(p)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return p, nil
+}
+func (rep *Repository) Delete(id uint)error{
+	res := rep.db.Clauses(clause.Returning{}).Delete(&Product{}, id)
+	if res.Error != nil {
+		return res.Error
 	}
 	return nil
 }
