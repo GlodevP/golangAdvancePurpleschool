@@ -1,17 +1,27 @@
 package order
 
-import "4-order-api/internal/store"
-
-
 type GetProductResponce struct{
 	Success bool `json:"success"`
-	store.Product
+	Product
 }
 
 type AddProductRequest struct{
-	store.Product
+	Product
 }
 
 type AddProductResponce struct{
+	Success bool `json:"success"`
+}
+
+type UpdateRequest struct{
+	Product
+}
+
+type UpdateResponse struct{
+	Success bool `json:"success"`
+	Product
+}
+
+type DeletResponse struct{
 	Success bool `json:"success"`
 }
