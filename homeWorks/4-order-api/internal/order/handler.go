@@ -30,7 +30,7 @@ func NewOrderHandle(cfg *config.Config, r *http.ServeMux, db *Repository) {
 	r.HandleFunc("POST /order", h.addOrderHandler())
 	r.HandleFunc("GET /order/{id}", h.getOrderHandler())
 	r.HandleFunc("PATCH /order/{id}", h.updateOrderHandler())
-	r.HandleFunc("DELET /order/{id}", h.deletOrderHandler())
+	r.HandleFunc("DELETE /order/{id}", h.deletOrderHandler())
 }
 
 func (handler OrderHandler) addOrderHandler() func(w http.ResponseWriter, r *http.Request) {
