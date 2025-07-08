@@ -7,6 +7,7 @@ import (
 	"temp/internal/auth"
 	"temp/internal/link"
 	"temp/pkg/db"
+	"temp/pkg/middleware"
 )
 
 func main() {
@@ -24,9 +25,10 @@ func main() {
 		Router:     router,
 		Repository: LinkRepository,
 	})
+	stack := middleware.Chain(middleware.CORS, middleware.Logging)
 	server := http.Server{
 		Addr:    cfg.WServer.Addr,
-		Handler: router,
+		Handler: stack(router),
 	}
 	server.ListenAndServe()
 
