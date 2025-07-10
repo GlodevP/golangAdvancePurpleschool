@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"temp/pkg/middleware"
 	"temp/pkg/request"
 	"temp/pkg/response"
 
@@ -27,12 +28,12 @@ func NewLinkHandler(dep *LinkRepositoryDeps) {
 	}
 	l.router.HandleFunc("POST /link", l.addLink())
 	l.router.HandleFunc("GET /link/{hash}", l.goToLink())
-	l.router.HandleFunc("PATCH /link/{id}", l.updateLink())
+	l.router.Handle("PATCH /link/{id}", middleware.IsAuthed(l.updateLink()))
 	l.router.HandleFunc("DELET /link/{id}", l.dellLink())
 
 }
 
-func (h *linkHandler) addLink() func(w http.ResponseWriter, r *http.Request) {
+func (h *linkHandler) addLink() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		body, err := request.HandleBody[CreateRequest](&w, r)
 		if err != nil {
@@ -55,7 +56,7 @@ func (h *linkHandler) addLink() func(w http.ResponseWriter, r *http.Request) {
 		response.Json(w, l, http.StatusCreated)
 	}
 }
-func (h *linkHandler) goToLink() func(w http.ResponseWriter, r *http.Request) {
+func (h *linkHandler) goToLink() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		hash := r.PathValue("hash")
 		if hash == "" {
@@ -70,7 +71,7 @@ func (h *linkHandler) goToLink() func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, l.Url, http.StatusTemporaryRedirect)
 	}
 }
-func (h *linkHandler) dellLink() func(w http.ResponseWriter, r *http.Request) {
+func (h *linkHandler) dellLink() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idString := r.PathValue("id")
 		if idString == "" {
@@ -95,7 +96,7 @@ func (h *linkHandler) dellLink() func(w http.ResponseWriter, r *http.Request) {
 		response.Json(w, nil, http.StatusOK)
 	}
 }
-func (h *linkHandler) updateLink() func(w http.ResponseWriter, r *http.Request) {
+func (h *linkHandler) updateLink() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		b, err := request.HandleBody[UpdateRequest](&w, r)
 		if err != nil {
