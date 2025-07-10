@@ -20,6 +20,7 @@ func main() {
 		log.Fatalln(err)
 	}
 	order.NewOrderHandle(cfg, router, db)
-	http.ListenAndServe(cfg.Webserver.Addr, middleware.Logging(router))
+	stack := middleware.Chain(middleware.Logging)
+	http.ListenAndServe(cfg.Webserver.Addr, stack(router))
 
 }

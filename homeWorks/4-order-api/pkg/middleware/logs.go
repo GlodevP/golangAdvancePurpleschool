@@ -10,10 +10,15 @@ import (
 func Logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		next.ServeHTTP(w, r)
+		wrapper := &WrapperWriter{
+			ResponseWriter: w,
+			StatusCode:     http.StatusOK,
+		}
+		next.ServeHTTP(wrapper, r)
 		end := time.Since(start)
 		log.WithFields(log.Fields{
-			"status":r.Method,
+			"status":wrapper.StatusCode,
+			"method":r.Method,
 			"url":r.URL,
 			"time":end,
 		}).Info()
